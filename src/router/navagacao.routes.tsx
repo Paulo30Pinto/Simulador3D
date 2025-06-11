@@ -6,16 +6,19 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import {
   type Navigation,
 } from '@toolpad/core/AppProvider';
+import Moto1 from '/public/icone/motor1.svg';
+import Rotor from 'public/img/Rotor.png';
+import Estator from '../../public/img/Estator.png';
 
 //export { Navigation };  // Export for type checking in AppProvider.tsx file.  // Import in App.tsx file.
 const MotorIcon = () => (
-  <img src="@public/icone/motor1.svg" alt="Motor Icon" style={{width: '24px', height: '24px'}} />
+  <img src={Moto1} alt="Motor Icon" style={{width: '24px', height: '24px'}} />
 );
 const RotorIcon = () => (
-  <img src="/@public/img/Rotor.png" alt="Motor Icon" style={{width: '24px', height: '24px'}} />
+  <img src={Rotor} alt="Motor Icon" style={{width: '24px', height: '24px'}} />
 );
 const EstatorIcon = () => (
-  <img src="../../@public/img/Estator.png" alt="Motor Icon" style={{width: '24px', height: '24px'}} />
+  <img src={Estator} alt="Motor Icon" style={{width: '24px', height: '24px'}} />
 );
 
 

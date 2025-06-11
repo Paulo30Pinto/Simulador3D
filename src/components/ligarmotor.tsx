@@ -1,0 +1,78 @@
+import React, { useEffect, useRef } from "react";
+import { registerAudio } from '../utils/audioManager';
+
+// Adicione tipagem global para evitar erro do TypeScript
+declare global {
+  interface Window {
+    Sketchfab?: any;
+  }
+}
+
+const SKETCHFAB_URL = "https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js";
+const MODEL_UID = "023f8252affe4c90a0ba14125d30ba87";
+ const audio = new Audio("/public/mp3/motor-loop-83480.mp3");
+ registerAudio(audio);
+
+
+export default function MotorLigado() {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    // Carrega o script da API se ainda não estiver carregado
+    if (!window.Sketchfab) {
+      const script = document.createElement("script");
+      script.src = SKETCHFAB_URL;
+      script.async = true;
+      script.onload = () => initSketchfab();
+      document.body.appendChild(script);
+
+      return () => {
+        document.body.removeChild(script);
+      };
+    } else {
+      initSketchfab();
+    }
+
+    function initSketchfab() {
+      if (!iframeRef.current || !window.Sketchfab) return;
+      const client = new window.Sketchfab(iframeRef.current);
+      client.init(MODEL_UID, {
+        success: function (api: any) {
+          api.start();
+            
+          api.addEventListener("viewerready", function () {
+            audio.play();
+            //loop audio
+            audio.loop = true;
+            console.log("Viewer is ready");
+            // Aqui você pode mostrar um alerta ou atualizar o estado
+           // alert("Modelo carregado com sucesso!");
+            console.log("Modelo carregado com sucesso!");
+            // Tocar audio ou executar outras ações
+           
+          
+            
+
+          });
+        },
+        error: function () {
+          console.log("Viewer error");
+        },
+      });
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  return (
+    <iframe
+      ref={iframeRef}
+      id="api-frame"
+      title="Sketchfab 3D Viewer"
+      allow="autoplay; fullscreen; xr-spatial-tracking; ui_controls=0"
+      width="100%"
+      height="600px"
+     
+      style={{ border: "none", backgroundColor: "transparent" }}
+    />
+  );
+}

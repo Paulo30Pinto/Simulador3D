@@ -18,7 +18,7 @@ declare global {
 
 const SKETCHFAB_URL = "https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js";
 const MODEL_UID = "023f8252affe4c90a0ba14125d30ba87";
- const audio = new Audio("/public/mp3/motor-loop-83480.mp3");
+ const audio = new Audio("/mp3/motor-loop-83480.mp3");
  registerAudio(audio);
 
 

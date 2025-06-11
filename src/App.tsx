@@ -73,7 +73,7 @@ export default function App(props: DemoProps) {
       branding={{
         logo: (
           <img
-            src="../public/logo.png"
+            src="/logo.png"
             alt="Monteiro & Monteiro"
           />
         ),
@@ -93,7 +93,7 @@ export default function App(props: DemoProps) {
             </Grid>
             <Grid size={{xs: 12, lg: 2}}>
               <div className='' style={{ maxWidth: '100%', height: '100%' }}>
-                  <img src="/public/img/multimetro2.png" alt="Logo" style={{ maxWidth: '100%', height: '70vh' }} />
+                  <img src="/img/multimetro2.png" alt="Logo" style={{ maxWidth: '100%', height: '70vh' }} />
               </div>
             </Grid>
           </Grid>

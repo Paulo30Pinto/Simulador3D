@@ -9,13 +9,13 @@ import {
 
 //export { Navigation };  // Export for type checking in AppProvider.tsx file.  // Import in App.tsx file.
 const MotorIcon = () => (
-  <img src="/public/icone/motor1.svg" alt="Motor Icon" style={{width: '24px', height: '24px'}} />
+  <img src="../../public/icone/motor1.svg" alt="Motor Icon" style={{width: '24px', height: '24px'}} />
 );
 const RotorIcon = () => (
-  <img src="/public/img/Rotor.png" alt="Motor Icon" style={{width: '24px', height: '24px'}} />
+  <img src="../../public/img/Rotor.png" alt="Motor Icon" style={{width: '24px', height: '24px'}} />
 );
 const EstatorIcon = () => (
-  <img src="/public/img/Estator.png" alt="Motor Icon" style={{width: '24px', height: '24px'}} />
+  <img src="../../public/img/Estator.png" alt="Motor Icon" style={{width: '24px', height: '24px'}} />
 );
 
 

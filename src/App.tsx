@@ -73,7 +73,7 @@ export default function App(props: DemoProps) {
       branding={{
         logo: (
           <img
-            src="./public/logo.png"
+            src="../public/logo.png"
             alt="Monteiro & Monteiro"
           />
         ),

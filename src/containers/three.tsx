@@ -1,17 +1,16 @@
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { createThreeScene } from "./three.ts";
 
 const ThreeViewer = () => {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (mountRef.current) {
-      const { renderer } = createThreeScene(mountRef.current);
+    const mountNode = mountRef.current;
+    if (mountNode) {
+      const { renderer } = createThreeScene(mountNode);
       return () => {
         // Limpeza ao desmontar
-        if (mountRef.current) {
-          mountRef.current.removeChild(renderer.domElement);
-        }
+        mountNode.removeChild(renderer.domElement);
       };
     }
   }, []);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { stopAllAudios } from '../utils/audioManager';
 import { MotorViewer } from '../components/model-viewer';
 import MotorLigado from '../components/ligarmotor';

@@ -1,4 +1,4 @@
-import * as React from 'react';
+
 import Box from '@mui/material/Box';
 import Home from '../pages/home';
 import Rotor from '../pages/rotor';

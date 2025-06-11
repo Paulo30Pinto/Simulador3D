@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+
 
 const ObjModelViewer = () => {
     // Referenciando o Canvas
@@ -7,7 +7,7 @@ const ObjModelViewer = () => {
     const context = canvas?.getContext('2d');
     // Desenhando um retângulo
     context?.fillRect(50, 50, 100, 100);
-   
+    
 
     return (
         <div className="objetoViewer">

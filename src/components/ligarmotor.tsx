@@ -1,10 +1,18 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { registerAudio } from '../utils/audioManager';
 
 // Adicione tipagem global para evitar erro do TypeScript
 declare global {
   interface Window {
-    Sketchfab?: any;
+    Sketchfab?: new (iframe: HTMLIFrameElement) => {
+      init: (
+        uid: string,
+        options: {
+          success: (api: unknown) => void;
+          error: () => void;
+        }
+      ) => void;
+    };
   }
 }
 
@@ -37,10 +45,17 @@ export default function MotorLigado() {
       if (!iframeRef.current || !window.Sketchfab) return;
       const client = new window.Sketchfab(iframeRef.current);
       client.init(MODEL_UID, {
-        success: function (api: any) {
-          api.start();
+        success: function (api: unknown) {
+          // If you know the type, you can replace 'unknown' with the correct interface/type
+          (api as { 
+            start: () => void; 
+            addEventListener: (event: string, callback: () => void) => void; 
+          }).start();
             
-          api.addEventListener("viewerready", function () {
+          (api as { 
+            start: () => void; 
+            addEventListener: (event: string, callback: () => void) => void; 
+          }).addEventListener("viewerready", function () {
             audio.play();
             //loop audio
             audio.loop = true;
@@ -60,7 +75,7 @@ export default function MotorLigado() {
         },
       });
     }
-    // eslint-disable-next-line
+    // Limpeza do efeito
   }, []);
 
   return (

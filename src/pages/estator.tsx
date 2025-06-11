@@ -1,4 +1,4 @@
-import React from 'react';
+
 //import { EstatorViewer }  from '../components/model-viewer';
 import Stator from '../components/stator';
 

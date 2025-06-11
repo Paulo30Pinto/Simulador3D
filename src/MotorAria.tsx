@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Estrutura inicial com base no fluxograma do PDF
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Typography, Box, Slider, Grid, Card, CardContent } from '@mui/material';
 
 

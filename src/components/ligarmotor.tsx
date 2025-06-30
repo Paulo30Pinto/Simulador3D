@@ -48,6 +48,7 @@ export default function MotorLigado() {
   iframeRef.current.src = `https://sketchfab.com/models/${MODEL_UID}/embed${params}`;
 
       const client = new window.Sketchfab(iframeRef.current);
+      console.log("Sketchfab client initialized", client);
       client.init(MODEL_UID, {
        
    
@@ -93,7 +94,7 @@ export default function MotorLigado() {
       ref={iframeRef}
       id="api-frame"
       title="Sketchfab 3D Viewer"
-      allow="autoplay; fullscreen; xr-spatial-tracking; ui_controls=0"
+      allow="autoplay; fullscreen; xr-spatial-tracking;"
       width="100%"
       height="600px"
       allow-scripts

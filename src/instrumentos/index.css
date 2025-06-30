@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.area-multimetro{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.conector_preto_drag,
+.conector_vermelho_drag {
+  transition: transform 0.2s ease;
+}
+
+.conector_preto_drag:hover,
+.conector_vermelho_drag:hover {
+  transform: scale(1.1);
+}
+
+.conector_preto_drag.dragging,
+.conector_vermelho_drag.dragging {
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Previne seleção de texto durante o drag */
+.area-multimetro * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+

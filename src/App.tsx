@@ -8,6 +8,8 @@ import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import NAVIGATION from './router/navagacao.routes';
 import PageContent from './containers/pageContent';
 import { Grid } from '@mui/material';
+import ControladorApp from './instrumentos/controlador';
+import MaterialDiagnostocos from './components/materialDiagnostocos';
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -88,12 +90,13 @@ export default function App(props: DemoProps) {
       <DashboardLayout defaultSidebarCollapsed>
         <div className='' style={{ maxWidth: '90vw', height: '100%' }}>
           <Grid container spacing={2}>
-            <Grid size={{xs: 12, lg: 10}}>
+            <Grid size={{ xs: 12, lg: 9 }}>
               <PageContent pathname={pathname} />
             </Grid>
-            <Grid size={{xs: 12, lg: 2}}>
-              <div className='' style={{ maxWidth: '100%', height: '100%' }}>
-                  <img src="/img/multimetro2.png" alt="Logo" style={{ maxWidth: '100%', height: '70vh' }} />
+            <Grid size={{ xs: 12, lg: 3,  }} >
+              <div style={{ padding: '10px', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <ControladorApp />
+                <MaterialDiagnostocos />
               </div>
             </Grid>
           </Grid>

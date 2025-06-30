@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef } from "react";
 import { registerAudio } from '../utils/audioManager';
 
@@ -72,7 +71,9 @@ export default function MotorComponetesPage() {
             console.log("Modelo carregado com sucesso!");
             // Tocar audio ou executar outras ações
 
-            (api as any).addEventListener("click", function (info: any) {
+            (api as  {
+  addEventListener: (event: string, callback: (info: { instanceID: number }) => void) => void;
+}).addEventListener("click", function (info: { instanceID: number }) {
               // info.instanceID é o ID do objeto clicado
               if (info && info.instanceID !== undefined) {
                 // Aqui você pode customizar: exibir alert apenas para certos objetos

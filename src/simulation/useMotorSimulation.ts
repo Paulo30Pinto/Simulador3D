@@ -41,11 +41,10 @@ export function useMotorSimulation(initialParameters: MotorParameters = defaultM
 
   const stop = useCallback(() => {
     setSnapshot((current) => ({
-      ...initialMotorSnapshot,
-      synchronousRpm: current.synchronousRpm,
+      ...current,
+      state: MotorState.Stopping,
       loadTorque: parameters.loadTorque,
     }));
-    setHistory([]);
   }, [parameters.loadTorque]);
 
   const setLoadTorque = useCallback((loadTorque: number) => {

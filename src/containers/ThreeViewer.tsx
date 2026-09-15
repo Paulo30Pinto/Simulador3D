@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import { createThreeScene } from "./three.ts";
+import { createThreeScene } from "./three";
 
 const ThreeViewer = () => {
   const mountRef = useRef<HTMLDivElement>(null);

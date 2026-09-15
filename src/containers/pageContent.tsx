@@ -4,7 +4,7 @@ import Home from '../pages/home';
 import Rotor from '../pages/rotor';
 import Estator from '../pages/estator';
 import Bobina from '../pages/bobina';
-import ThreeViewer from './three.tsx';
+import MotorComponetesPage from '../components/motorComp';
 
 
 export default function PageContent({ pathname }: { pathname: string }) {
@@ -19,11 +19,12 @@ export default function PageContent({ pathname }: { pathname: string }) {
             case 'bobina':
                 return <Bobina />;
             case 'outros':
-                return <ThreeViewer />;
+                return <MotorComponetesPage />;
             default:
                 return <Home />;
         }
     };
+
     return (
         <Box
             sx={{

@@ -1,0 +1,8 @@
+{
+  "name": "Simulador 3D - Motor Elétrico",
+  "description": "Simulador 3D interativo de motor elétrico de indução trifásico com visualização de componentes, estator, rotor e instrumentos de diagnóstico.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

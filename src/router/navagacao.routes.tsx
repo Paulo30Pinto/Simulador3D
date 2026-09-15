@@ -43,8 +43,9 @@ const NAVIGATION: Navigation = [
 
   {
     segment: "outros",
-    title: "Outros",
-    icon: <BarChartIcon  />,
+    title: "Componentes",
+    icon: <BarChartIcon />,
   }
+
 ];
   export default NAVIGATION;

@@ -5,7 +5,18 @@ export enum MotorState {
   Running = 'REGIME',
   Overload = 'SOBRECARGA',
   Stopping = 'PARANDO',
+  Fault = 'FALHA',
 }
+
+export interface MotorFaults {
+  openPhase: boolean; // Perda de uma das 3 fases (fase aberta)
+  rotorImbalance: boolean; // Desbalanceamento mecânico/elétrico no rotor (barras partidas)
+}
+
+export const defaultMotorFaults: MotorFaults = {
+  openPhase: false,
+  rotorImbalance: false,
+};
 
 export interface MotorParameters {
   voltage: number;
@@ -17,6 +28,8 @@ export interface MotorParameters {
   friction: number;
   statorResistance: number;
   rotorResistance: number;
+  statorLeakageReactance?: number;
+  rotorLeakageReactance?: number;
   magnetizingReactance: number;
 }
 
@@ -32,19 +45,33 @@ export interface MotorSnapshot {
   power: number;
   powerFactor: number;
   efficiency: number;
+  maxTorque?: number;
+  criticalSlip?: number;
+  startingTorque?: number;
+  startingCurrent?: number;
+  faults?: MotorFaults;
+  vibration?: number; // Nível de vibração RMS mm/s
+  phaseCurrents?: {
+    phaseA: number;
+    phaseB: number;
+    phaseC: number;
+  };
 }
+
 
 export const defaultMotorParameters: MotorParameters = {
   voltage: 380,
   frequency: 50,
   poles: 4,
   ratedPower: 10_000,
-  inertia: 0.18,
-  loadTorque: 18,
-  friction: 0.018,
+  inertia: 0.15,
+  loadTorque: 25,
+  friction: 0.012,
   statorResistance: 0.42,
-  rotorResistance: 0.28,
-  magnetizingReactance: 18,
+  rotorResistance: 0.32,
+  statorLeakageReactance: 0.95,
+  rotorLeakageReactance: 0.95,
+  magnetizingReactance: 22.0,
 };
 
 export const initialMotorSnapshot: MotorSnapshot = {

@@ -1,108 +1,137 @@
-import { useEffect, useRef } from "react";
-import { registerAudio } from '../utils/audioManager';
-
-// Adicione tipagem global para evitar erro do TypeScript
-declare global {
-  interface Window {
-    Sketchfab?: new (iframe: HTMLIFrameElement) => {
-      init: (
-        uid: string,
-        options: {
-          success: (api: unknown) => void;
-          error: () => void;
-        }
-      ) => void;
-    };
-  }
-}
-
-const SKETCHFAB_URL = "https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js";
-const MODEL_UID = "023f8252affe4c90a0ba14125d30ba87";
-const audio = new Audio("/mp3/motor-loop-83480.mp3");
-registerAudio(audio);
-
+import { useEffect, useRef, useState, useCallback } from "react";
+import { Box, Button, Card, CardContent, Stack, Typography, Chip, Switch, FormControlLabel, Tooltip } from "@mui/material";
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StopIcon from '@mui/icons-material/Stop';
+import { MotorViewer } from "./model-viewer";
+import { registerAudio, stopAllAudios } from "../utils/audioManager";
 
 export default function MotorLigado() {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isRunning, setIsRunning] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [rpm, setRpm] = useState(1440);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Initialize offline audio
   useEffect(() => {
-    // Carrega o script da API se ainda não estiver carregado
-    if (!window.Sketchfab) {
-      const script = document.createElement("script");
-      script.src = SKETCHFAB_URL;
-      script.async = true;
-      script.onload = () => initSketchfab();
-      document.body.appendChild(script);
+    const audio = new Audio("/mp3/motor-loop-83480.mp3");
+    audio.loop = true;
+    audio.volume = 0.4;
+    registerAudio(audio);
+    audioRef.current = audio;
 
-      return () => {
-        document.body.removeChild(script);
-      };
-    } else {
-      initSketchfab();
-    }
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+      stopAllAudios();
+    };
+  }, []);
 
-    function initSketchfab() {
-      if (!iframeRef.current || !window.Sketchfab) return;
-        const params =
-    "?autostart=1&ui_controls=0&ui_infos=0&ui_hint=0&ui_watermark=0&ui_stop=0&ui_ar=0&ui_fullscreen=0&ui_inspector=0&ui_settings=0&transparent=1&ui_theme=dark";
-  iframeRef.current.src = `https://sketchfab.com/models/${MODEL_UID}/embed${params}`;
+  // Manage audio play/pause on state change
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
 
-      const client = new window.Sketchfab(iframeRef.current);
-      console.log("Sketchfab client initialized", client);
-      client.init(MODEL_UID, {
-       
-   
-        success: function (api: unknown) {
-          
-          // If you know the type, you can replace 'unknown' with the correct interface/type
-          (api as {
-            start: () => void;
-            addEventListener: (event: string, callback: () => void) => void;
-          }).start();
-
-          (api as {
-            start: () => void;
-            addEventListener: (event: string, callback: () => void) => void;
-          }).addEventListener("viewerready", function () {
-            audio.play();
-            //loop audio
-            audio.loop = true;
-            console.log("Viewer is ready");
-            // Aqui você pode mostrar um alerta ou atualizar o estado
-            // alert("Modelo carregado com sucesso!");
-            console.log("Modelo carregado com sucesso!");
-            // Tocar audio ou executar outras ações
-
-
-
-
-          });
-        },
-        
-        error: function () {
-          console.log("Viewer error");
-          
-        },
-        
+    if (isRunning && soundEnabled) {
+      audio.play().catch(() => {
+        // Handled silently if autoplay policy requires user interaction
       });
+    } else {
+      audio.pause();
     }
-    // Limpeza do efeito
+  }, [isRunning, soundEnabled]);
+
+  const toggleRun = useCallback(() => {
+    setIsRunning((prev) => {
+      const next = !prev;
+      setRpm(next ? 1440 : 0);
+      return next;
+    });
   }, []);
 
   return (
-    <iframe
-      ref={iframeRef}
-      id="api-frame"
-      title="Sketchfab 3D Viewer"
-      allow="autoplay; fullscreen; xr-spatial-tracking;"
-      width="100%"
-      height="600px"
-      allow-scripts
-      allow-same-origin
-      allow-popups
-      allow-forms
+    <Box sx={{ color: "text.primary" }}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "flex-start", sm: "center" }}
+        gap={2}
+        mb={2}
+      >
+        <Box>
+          <Typography variant="overline" color="text.secondary">
+            Visualização Dinâmica 3D
+          </Typography>
+          <Typography variant="h5" fontWeight={700}>
+            Motor em Operação
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Modelo 3D local em tempo real com rotação física síncrona
+          </Typography>
+        </Box>
 
-      style={{ border: "none", backgroundColor: "transparent" }}
-    />
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          <Tooltip title="Ativa ou desativa o efeito sonoro de rotação e zumbido eletromagnético do motor" arrow>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={soundEnabled}
+                  onChange={(e) => setSoundEnabled(e.target.checked)}
+                  color="primary"
+                  size="small"
+                />
+              }
+              label={
+                <Stack direction="row" spacing={0.5} alignItems="center">
+                  {soundEnabled ? <VolumeUpIcon fontSize="small" /> : <VolumeOffIcon fontSize="small" />}
+                  <Typography variant="body2">Áudio</Typography>
+                </Stack>
+              }
+            />
+          </Tooltip>
+
+          <Tooltip title={isRunning ? "Desliga o motor e cessa a rotação do rotor 3D" : "Aciona o motor acelerando-o até a velocidade nominal de 1440 RPM"} arrow>
+            <Button
+              variant="contained"
+              color={isRunning ? "error" : "success"}
+              startIcon={isRunning ? <StopIcon /> : <PlayArrowIcon />}
+              onClick={toggleRun}
+            >
+              {isRunning ? "Desligar" : "Acionar"}
+            </Button>
+          </Tooltip>
+        </Stack>
+      </Stack>
+
+      <Card sx={{ bgcolor: "rgba(17, 24, 39, 0.7)", border: "1px solid rgba(255, 255, 255, 0.08)" }}>
+        <CardContent sx={{ p: 1.5 }}>
+          <MotorViewer
+            rpm={rpm}
+            state={isRunning ? "Em Rotação (Nominal)" : "Desligado"}
+            height="62vh"
+          />
+        </CardContent>
+      </Card>
+
+      <Stack direction="row" spacing={1.5} mt={2} flexWrap="wrap">
+        <Tooltip title="Estado de operação mecânica do motor" arrow>
+          <Chip label={`Status: ${isRunning ? "Ligado" : "Parado"}`} color={isRunning ? "success" : "default"} />
+        </Tooltip>
+        <Tooltip title="Velocidade de rotação mecânica angular atual no eixo" arrow>
+          <Chip label={`Velocidade: ${rpm} RPM`} color="primary" variant="outlined" />
+        </Tooltip>
+        <Tooltip title="Tensão nominal de alimentação trifásica entre fases (tensão de linha)" arrow>
+          <Chip label="Tensão: 380 V (Trifásico)" variant="outlined" />
+        </Tooltip>
+        <Tooltip title="Frequência fundamental da rede de alimentação elétrica" arrow>
+          <Chip label="Frequência: 50 Hz" variant="outlined" />
+        </Tooltip>
+        <Tooltip title="Potência mecânica nominal de regime contínuo (S1)" arrow>
+          <Chip label="Potência: 10 kW (13.6 cv)" variant="outlined" />
+        </Tooltip>
+      </Stack>
+    </Box>
   );
 }
+

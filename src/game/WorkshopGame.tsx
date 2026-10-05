@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import '@google/model-viewer'
 import { MOTOR_PARTS, PHASES, TOOLS, FAULTS, type PhaseId, type ToolId } from './parts/partsData'
+import { useMotorSimulation } from '../simulation/useMotorSimulation'
 
 const phaseIndex = (phase: PhaseId) => PHASES.findIndex((item) => item.id === phase)
 
@@ -14,6 +15,8 @@ export default function WorkshopGame() {
   const [message, setMessage] = useState('Selecione uma peça para começar')
   const [fault] = useState(() => FAULTS[Math.floor(Math.random() * FAULTS.length)])
   const [inspectionPulse, setInspectionPulse] = useState<string | null>(null)
+  const simulation = useMotorSimulation()
+  const { snapshot } = simulation
 
   const missionComplete = phase === 'repair' && removed.length === 0
   const symptom = fault.symptom
@@ -53,7 +56,10 @@ export default function WorkshopGame() {
     setPhase(next)
     setMessage(PHASES.find((item) => item.id === next)?.hint ?? '')
     setInspectionPulse(null)
-    if (next === 'explore') setPowered(false)
+    if (next === 'explore') {
+      setPowered(false)
+      simulation.stop()
+    }
   }
 
   function togglePower() {
@@ -61,8 +67,14 @@ export default function WorkshopGame() {
       setMessage('Finalize a montagem antes do teste')
       return
     }
+    if (powered) {
+      simulation.stop()
+      setMessage('Motor desligando por inércia')
+    } else {
+      simulation.start()
+      setMessage('Motor energizado: aceleração iniciada')
+    }
     setPowered((value) => !value)
-    setMessage(powered ? 'Motor desligado' : 'Motor em teste')
   }
 
   return (
@@ -92,6 +104,7 @@ export default function WorkshopGame() {
             {activePart && <div className="floating-label"><span>{activePart.icon}</span><div><b>{activePart.name}</b><small>PEÇA SELECIONADA</small></div></div>}
             {powered && <div className="running-badge"><span>◉</span> MOTOR EM FUNCIONAMENTO</div>}
             {phase === 'diagnose' && <div className={`symptom-badge ${scanned.includes(fault.part) ? 'found' : ''}`}><span>{scanned.includes(fault.part) ? '✓' : '!'}</span> {scanned.includes(fault.part) ? 'FALHA IDENTIFICADA' : 'SINTOMA DETECTADO'}</div>}
+            {powered && <div className="telemetry-strip" aria-label="Telemetria do motor"><span><b>{snapshot.rpm.toFixed(0)}</b> RPM</span><span><b>{snapshot.current.toFixed(1)}</b> A</span><span><b>{snapshot.torque.toFixed(1)}</b> Nm</span><span><b>{(snapshot.slip * 100).toFixed(1)}</b> % SLIP</span></div>}
           </div>
           <div className="scene-footer"><span>◉ ARRRASTE PARA ORBITAR</span><span>⌕ CLIQUE NAS PEÇAS</span><span>⌗ SCROLL PARA ZOOM</span></div>
         </section>
@@ -99,6 +112,7 @@ export default function WorkshopGame() {
         <aside className="control-panel">
           <div className="panel-heading"><span>PAINEL DE CONTROLE</span><b>●</b></div>
           <div className="progress-card"><div className="progress-title"><span>PROGRESSO DA FASE</span><strong>{phase === 'disassemble' ? removed.length : phase === 'diagnose' ? scanned.length : phase === 'repair' ? MOTOR_PARTS.length - removed.length : 1}<small> / {MOTOR_PARTS.length}</small></strong></div><div className="progress-bar"><i style={{ width: `${phase === 'disassemble' ? (removed.length / MOTOR_PARTS.length) * 100 : phase === 'diagnose' ? (scanned.length / 1) * 100 : phase === 'repair' ? ((MOTOR_PARTS.length - removed.length) / MOTOR_PARTS.length) * 100 : 18}%` }} /></div></div>
+          <div className="physics-card" aria-label="Medições do motor"><div className="section-title">TELEMETRIA <span>{snapshot.state}</span></div><div className="physics-grid"><span><small>RPM</small><b>{snapshot.rpm.toFixed(0)}</b></span><span><small>SÍNCRONA</small><b>{snapshot.synchronousRpm.toFixed(0)}</b></span><span><small>CORRENTE</small><b>{snapshot.current.toFixed(1)} A</b></span><span><small>TORQUE</small><b>{snapshot.torque.toFixed(1)} Nm</b></span><span><small>SLIP</small><b>{(snapshot.slip * 100).toFixed(1)}%</b></span><span><small>POTÊNCIA</small><b>{(snapshot.power / 1000).toFixed(2)} kW</b></span></div></div>
           <div className="panel-section"><div className="section-title">FERRAMENTAS <span>⌄</span></div><div className="tool-grid">{TOOLS.map((item) => <button key={item.id} className={tool === item.id ? 'selected' : ''} onClick={() => { setTool(item.id); setMessage(item.label) }}><span>{item.icon}</span><small>{item.label}</small></button>)}</div></div>
           <div className="panel-section parts-section"><div className="section-title">PEÇAS DO MOTOR <span>{MOTOR_PARTS.length}</span></div><div className="parts-list">{MOTOR_PARTS.map((part) => <button key={part.id} className={`${selected === part.id ? 'selected' : ''} ${removed.includes(part.id) ? 'in-tray' : ''}`} onClick={() => selectPart(part.id)}><span className="part-symbol">{part.icon}</span><span>{part.short}</span><i>{removed.includes(part.id) ? 'TRAY' : selected === part.id ? 'ATIVO' : 'OK'}</i></button>)}</div></div>
           <button className="next-button" onClick={() => changePhase(PHASES[Math.min(phaseIndex(phase) + 1, PHASES.length - 1)].id)}>{phase === 'repair' ? 'FINALIZAR MONTAGEM' : 'AVANÇAR FASE'} <span>→</span></button>

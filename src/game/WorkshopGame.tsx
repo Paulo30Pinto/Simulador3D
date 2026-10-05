@@ -13,6 +13,10 @@ export default function WorkshopGame() {
   const [scanned, setScanned] = useState<string[]>([])
   const [message, setMessage] = useState('Selecione uma peça para começar')
   const [fault] = useState(() => FAULTS[Math.floor(Math.random() * FAULTS.length)])
+  const [inspectionPulse, setInspectionPulse] = useState<string | null>(null)
+
+  const missionComplete = phase === 'repair' && removed.length === 0
+  const symptom = fault.symptom
 
   const currentOrder = removed.length
   const activePart = useMemo(() => MOTOR_PARTS.find((part) => part.id === selected), [selected])
@@ -20,6 +24,7 @@ export default function WorkshopGame() {
 
   function selectPart(id: string) {
     setSelected(id)
+    setInspectionPulse(id)
     const part = MOTOR_PARTS.find((item) => item.id === id)
     if (!part) return
     if (phase === 'disassemble') {
@@ -47,7 +52,17 @@ export default function WorkshopGame() {
   function changePhase(next: PhaseId) {
     setPhase(next)
     setMessage(PHASES.find((item) => item.id === next)?.hint ?? '')
+    setInspectionPulse(null)
     if (next === 'explore') setPowered(false)
+  }
+
+  function togglePower() {
+    if (!powered && !missionComplete && phase === 'repair') {
+      setMessage('Finalize a montagem antes do teste')
+      return
+    }
+    setPowered((value) => !value)
+    setMessage(powered ? 'Motor desligado' : 'Motor em teste')
   }
 
   return (
@@ -55,7 +70,7 @@ export default function WorkshopGame() {
       <header className="topbar">
         <div className="brand-mark"><span>⚡</span><div><strong>WORKSHOP</strong><small>LAB // MOTOR ELÉTRICO</small></div></div>
         <div className="session-status"><i /> SESSÃO AO VIVO <span>•</span> BANCADA 01</div>
-        <button className={`power-button ${powered ? 'is-on' : ''}`} onClick={() => setPowered((value) => !value)} aria-label={powered ? 'Desligar motor' : 'Ligar motor'}><span>⏻</span><b>{powered ? 'DESLIGAR' : 'LIGAR'}</b></button>
+        <button className={`power-button ${powered ? 'is-on' : ''}`} onClick={togglePower} aria-label={powered ? 'Desligar motor' : 'Ligar motor'}><span>⏻</span><b>{powered ? 'DESLIGAR' : 'LIGAR'}</b></button>
       </header>
 
       <div className="game-layout">
@@ -66,14 +81,14 @@ export default function WorkshopGame() {
         </aside>
 
         <section className="scene-column">
-          <div className="scene-header"><div><span className="eyebrow">FASE 0{phaseIndex(phase) + 1} / {PHASES.length}</span><h1>{PHASES.find((item) => item.id === phase)?.label}</h1></div><div className="scene-hint"><span>↗</span>{message}</div></div>
+          <div className="scene-header"><div><span className="eyebrow">FASE 0{phaseIndex(phase) + 1} / {PHASES.length}</span><h1>{PHASES.find((item) => item.id === phase)?.label}</h1></div><div className="scene-hint"><span>↗</span>{phase === 'diagnose' ? `SINTOMA: ${symptom}` : message}</div></div>
           <div className={`scene ${powered ? 'running' : ''} ${isFaultTarget ? 'fault-active' : ''}`}>
             <div className="ambient ambient-one" /><div className="ambient ambient-two" />
             <div className="workbench-grid" />
             <div className="scene-tag"><span className="pulse-dot" /> MOTOR ASSÍNCRONO <b>•</b> 3D VIEW</div>
             <model-viewer className="motor-model" src="/assets/elementos3d/motor_eletrico_aberto.glb" alt="Motor elétrico 3D" camera-controls shadow-intensity="1.4" shadow-softness="0.8" exposure="1.1" environment-image="neutral" camera-orbit="25deg 72deg 105%" min-camera-orbit="auto 50deg 75%" max-camera-orbit="auto 90deg 130%" interaction-prompt="none" {...(powered ? { 'auto-rotate': true, 'rotation-per-second': '90deg' } : {})} />
             <div className="model-glow" />
-            <div className="part-hotspot hotspot-cover" onClick={() => selectPart('cover')}><span>◉</span></div><div className="part-hotspot hotspot-rotor" onClick={() => selectPart('rotor')}><span>⊙</span></div><div className="part-hotspot hotspot-coil" onClick={() => selectPart('coil')}><span>≋</span></div>
+            <div className={`part-hotspot hotspot-cover ${inspectionPulse === 'cover' ? 'is-inspected' : ''}`} onClick={() => selectPart('cover')}><span>◉</span></div><div className={`part-hotspot hotspot-rotor ${inspectionPulse === 'rotor' ? 'is-inspected' : ''}`} onClick={() => selectPart('rotor')}><span>⊙</span></div><div className={`part-hotspot hotspot-coil ${inspectionPulse === 'coil' ? 'is-inspected' : ''}`} onClick={() => selectPart('coil')}><span>≋</span></div>
             {activePart && <div className="floating-label"><span>{activePart.icon}</span><div><b>{activePart.name}</b><small>PEÇA SELECIONADA</small></div></div>}
             {powered && <div className="running-badge"><span>◉</span> MOTOR EM FUNCIONAMENTO</div>}
             {phase === 'diagnose' && <div className={`symptom-badge ${scanned.includes(fault.part) ? 'found' : ''}`}><span>{scanned.includes(fault.part) ? '✓' : '!'}</span> {scanned.includes(fault.part) ? 'FALHA IDENTIFICADA' : 'SINTOMA DETECTADO'}</div>}

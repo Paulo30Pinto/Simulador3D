@@ -7,7 +7,7 @@ export type MotorPart = {
   model: string
   order: number
   icon: string
-  diagnosticTool?: string
+  diagnosticTool?: ToolId
   faulty?: boolean
 }
 

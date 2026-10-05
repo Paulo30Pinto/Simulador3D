@@ -34,3 +34,20 @@ once so the lockfile stays in sync, otherwise the frozen install at container st
   requests return 200), clicking `LIGAR` on the Motor page must spin the simulation up to ~1484 RPM, and the
   console must stay free of errors.
 - `npm install && npm run build` (`tsc -b && vite build`) must also succeed for npm-based environments.
+
+## Jogo da oficina (sidebar → Oficina)
+- Código em `src/game/` — `parts/` (catálogo das peças), `state/` (regras + contexto), `audio/` (Web Audio sintetizado
+  + `/mp3/electric-motor-whir-77588.mp3` para o motor), `components/`, `phases/`, `legacy/` (MotorAria/MotorCopilot, não usados).
+- Estado do jogo: React Context + reducer (`GameProvider`), **sem dependências novas**. Persiste em
+  `localStorage['motor-game-v1']` = fase, peças montadas e record de diagnósticos; ao abrir, o jogo retoma a fase
+  guardada, por isso os ícones de fase no HUD são clicáveis (recomeçam qualquer fase).
+- O motor é ilustrado por um único `<model-viewer>` que troca de `.glb`: peça selecionada, ou o conjunto
+  (`motor.glb` → `motor_aberto1.glb` → `estator2.glb`) conforme as peças saem. As peças são pontos interactivos
+  (chips) sobre a bancada, não malhas separadas dentro do modelo.
+- Gestos: arrastar chip → bandeja (desmontar) e bandeja → bancada (montar); clique/toque selecciona (e, no
+  diagnóstico, lê a peça com a ferramenta activa). Implementado com Pointer Events + `elementFromPoint`.
+- Verificação (a que correu bem): desmontagem fora de ordem é recusada com vibração vermelha; a ordem guiada
+  funciona; a fase de diagnóstico só fica verde com a ferramenta certa na peça avariada; apontar a peça avariada
+  passa à reparação com a peça nova a brilhar na bandeja.
+- Verificação manual ainda em falta: remontagem completa + veredito "Motor OK" (o iframe do preview caiu a meio
+  da última sequência; o servidor manteve-se saudável).

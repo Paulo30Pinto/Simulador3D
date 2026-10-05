@@ -2,6 +2,7 @@
 import DashboardIcon from '@mui/icons-material/Dashboard';
 //import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
+import HandymanIcon from '@mui/icons-material/Handyman';
 
 import {
   type Navigation,
@@ -20,6 +21,11 @@ const EstatorIcon = () => (
 
 
 const NAVIGATION: Navigation = [
+  {
+    segment: "oficina",
+    title: "Oficina",
+    icon: <HandymanIcon />,
+  },
   {
     segment: "motor",
     title: "Motor",

@@ -5,11 +5,14 @@ import Rotor from '../pages/rotor';
 import Estator from '../pages/estator';
 import Bobina from '../pages/bobina';
 import MotorComponetesPage from '../components/motorComp';
+import GameMode from '../game/GameMode';
 
 
 export default function PageContent({ pathname }: { pathname: string }) {
     const renderPage = () => {
         switch (pathname.replace('/', '')) {
+            case 'oficina':
+                return <GameMode />;
             case 'motor':
                 return <Home />;
             case 'rotor':
